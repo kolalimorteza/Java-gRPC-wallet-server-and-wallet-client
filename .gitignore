@@ -1,0 +1,32 @@
+# IntelliJ IDEA
+*.iml
+*.ipr
+*.iws
+/.idea
+
+# Eclipse
+.classpath
+.settings
+.project
+.metadata
+.buildpath
+
+
+# Temporary files
+**/*.log*
+**/*.layout*
+*.tmp
+**/.DS_Store
+
+node-basic
+.gitignore~
+.gradle/
+build.gradle~
+out/
+build/
+classes
+
+/scm-source.json
+VERSION
+
+gradle/wrapper/*

@@ -1,0 +1,83 @@
+plugins {
+    // Provide convenience executables for trying out the examples.
+    id 'application'
+    // ASSUMES GRADLE 2.12 OR HIGHER. Use plugin version 0.7.5 with earlier gradle versions
+    id 'com.google.protobuf' version '0.8.5'
+    // Generate IntelliJ IDEA's .idea & .iml project files
+    id 'idea'
+}
+
+repositories {
+    maven { // The google mirror is less flaky than mavenCentral()
+        url "https://maven-central.storage-download.googleapis.com/repos/central/data/"
+    }
+    mavenLocal()
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+def grpcVersion = '1.18.0' // CURRENT_GRPC_VERSION
+def protocVersion = '3.5.1-1'
+
+dependencies {
+    implementation "io.grpc:grpc-protobuf:${grpcVersion}"
+    implementation "io.grpc:grpc-stub:${grpcVersion}"
+
+    compile 'org.slf4j:slf4j-api:1.7.25'
+    compile 'org.slf4j:slf4j-simple:1.7.25'
+    compile 'org.hibernate:hibernate-core:5.4.1.Final'
+    compile 'mysql:mysql-connector-java:5.1.6'
+
+    compileOnly "javax.annotation:javax.annotation-api:1.2"
+    runtimeOnly "io.grpc:grpc-netty-shaded:${grpcVersion}"
+
+    testCompile 'org.mockito:mockito-all:1.10.19'
+    testImplementation "io.grpc:grpc-testing:${grpcVersion}"
+    testImplementation "junit:junit:4.12"
+    testImplementation "org.mockito:mockito-core:1.9.5"
+}
+
+
+protobuf {
+    protoc { artifact = "com.google.protobuf:protoc:${protocVersion}" }
+    plugins {
+        grpc { artifact = "io.grpc:protoc-gen-grpc-java:${grpcVersion}" }
+    }
+    generateProtoTasks {
+        all()*.plugins { grpc {} }
+    }
+}
+
+// Inform IDEs like IntelliJ IDEA, Eclipse or NetBeans about the generated code.
+sourceSets {
+    main {
+        java {
+            srcDirs 'build/generated/source/proto/main/grpc'
+            srcDirs 'build/generated/source/proto/main/java'
+        }
+    }
+}
+
+startScripts.enabled = false
+
+
+task walletServer(type: CreateStartScripts) {
+    mainClassName = 'com.betpawa.wallet.server.WalletServer'
+    applicationName = 'wallet-server'
+    outputDir = new File(project.buildDir, 'tmp')
+    classpath = startScripts.classpath
+}
+
+task walletClientCli(type: CreateStartScripts) {
+    mainClassName = 'com.betpawa.wallet.client.WalletClientCli'
+    applicationName = 'wallet-client-cli'
+    outputDir = new File(project.buildDir, 'tmp')
+    classpath = startScripts.classpath
+}
+
+applicationDistribution.into('bin') {
+    from(walletServer)
+    from(walletClientCli)
+    fileMode = 0755
+}

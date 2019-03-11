@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.betpawa.wallet";
+option java_outer_classname = "WalletProto";
+option objc_class_prefix = "WALLET";
+
+
+service WalletService {
+    rpc deposit(DepositRequest) returns (Empty) {}
+    rpc withdraw(WithdrawRequest) returns (Empty) {}
+    rpc balance(BalanceRequest) returns (BalanceResponse) {}
+}
+
+service WalletEmulator {
+    rpc initDatabase(InitDatabaseRequest) returns (Empty) {}
+}
+
+message DepositRequest {
+    int32 userId = 1;
+    float amount = 2;
+    CURRENCY currency = 3;
+}
+
+message WithdrawRequest {
+    int32 userId = 1;
+    float amount = 2;
+    CURRENCY currency = 3;
+}
+
+message BalanceRequest {
+    int32 userId = 1;
+}
+
+message BalanceResponse {
+    repeated Balance balance = 1;
+}
+
+message Balance {
+    float amount = 1;
+    CURRENCY currency = 2;
+}
+
+enum CURRENCY {
+    USD = 0;
+    EUR = 1;
+    GBP = 2;
+}
+
+message Empty {
+}
+
+message InitDatabaseRequest {
+    int32 numOfUsers = 1;
+}
